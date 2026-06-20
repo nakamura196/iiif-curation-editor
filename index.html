@@ -3,8 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IIIF キュレーション・エディタ｜AI検出した領域を人手で確定</title>
-<meta name="description" content="IIIF Curation List を読み込み、AIが検出した領域アノテーション(顔・物体・文字など)をブラウザ内でo/x確認し、クリーンなground-truth(IIIF Curation)を作る独立ツール。OpenSeadragonで拡大、画像はサーバに送らない。">
+<title>IIIF Curation Editor ｜ IIIFキュレーション・エディタ(領域アノテーションを人手で確定)</title>
+<meta name="description" content="IIIF Curation List を読み込み、AIが検出した領域アノテーション(顔・物体・文字など)をブラウザ内で○×確認し、クリーンな ground-truth(IIIF Curation)を作る独立ツール。OpenSeadragonで原寸拡大、画像はサーバに送らない。Browser-only IIIF region annotation review/curation editor.">
+<meta name="keywords" content="IIIF, IIIF Curation, OpenSeadragon, annotation, image annotation, ground truth, curation viewer, KaoKore, 顔貌コレクション, デジタルアーカイブ, digital humanities">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#004898">
+<link rel="canonical" href="https://nakamura196.github.io/iiif-curation-editor/">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="IIIF Curation Editor">
+<meta property="og:title" content="IIIF Curation Editor ｜ IIIFキュレーション・エディタ">
+<meta property="og:description" content="AIが付けた領域アノテーションをブラウザ内で○×確認し、クリーンな IIIF Curation を書き出す汎用ツール。Browser-only IIIF region annotation editor.">
+<meta property="og:url" content="https://nakamura196.github.io/iiif-curation-editor/">
+<meta property="og:image" content="https://nakamura196.github.io/iiif-curation-editor/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:locale:alternate" content="en_US">
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="IIIF Curation Editor">
+<meta name="twitter:description" content="Browser-only editor to review & curate IIIF region annotations (Keep/Drop) and export a clean IIIF Curation.">
+<meta name="twitter:image" content="https://nakamura196.github.io/iiif-curation-editor/og.png">
+<!-- Structured data -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"IIIF Curation Editor",
+ "url":"https://nakamura196.github.io/iiif-curation-editor/","applicationCategory":"DesignApplication",
+ "operatingSystem":"Web browser","browserRequirements":"Requires JavaScript",
+ "offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"},
+ "inLanguage":["ja","en"],"image":"https://nakamura196.github.io/iiif-curation-editor/og.png",
+ "description":"Browser-only editor to review and curate IIIF region annotations and export a clean IIIF Curation."}
+</script>
 <link rel="stylesheet" href="css/utokyo.css">
 <script src="js/ui.js"></script>
 </head>
