@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IIIF キュレーション・エディタ ｜ Editor</title>
+<title>AnnoVerdict ｜ Editor</title>
 <meta name="description" content="IIIF Curation List を読み込んで領域アノテーションを○×確認・書き出すブラウザ内エディタ。">
 <meta name="theme-color" content="#004898">
-<link rel="canonical" href="https://nakamura196.github.io/iiif-curation-editor/editor.html">
+<link rel="canonical" href="https://nakamura196.github.io/anno-verdict/editor.html">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta property="og:title" content="IIIF Curation Editor">
+<meta property="og:title" content="AnnoVerdict">
 <meta property="og:description" content="Browser-only IIIF region annotation review & curation editor.">
-<meta property="og:image" content="https://nakamura196.github.io/iiif-curation-editor/og.png">
+<meta property="og:image" content="https://nakamura196.github.io/anno-verdict/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="css/utokyo.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
@@ -108,7 +108,8 @@ function parseCuration(c){
       items.push({key:mid, fig:canvas, canvas, manifest:within, bbox:[x,y,x+w,y+h],
         crop:`${canvas}/${x},${y},${w},${h}/${THUMB},/0/default.jpg`,
         tile:canvas+"/info.json", title:md.title||"", source:md.source||"iiif",
-        conf:(md.confidence||md.conf||""), sex:md.sex||"", label:m.label||""});
+        conf:(md.confidence||md.conf||""), sex:md.sex||"", label:m.label||"",
+        decision:(md.decision||"keep")});  // メタの判定で○×?を初期表示
     });
   });
   return items;
@@ -119,7 +120,7 @@ function load(c, name){
   byFig={}; ITEMS.forEach(it=>{(byFig[it.fig]=byFig[it.fig]||[]).push(it);});
   ITEMS.forEach((it,i)=>it.i=byFig[it.fig].indexOf(it));
   try{dec=JSON.parse(localStorage.getItem(LS)||"{}")}catch(e){dec={}}
-  ITEMS.forEach(it=>{if(!(it.key in dec))dec[it.key]="keep";});
+  ITEMS.forEach(it=>{if(!(it.key in dec))dec[it.key]=it.decision||"keep";});
   $("src").textContent=`${name||"読込"}: 顔${ITEMS.length} / canvas${Object.keys(byFig).length}`;
   $("empty").style.display="none"; $("grid").style.display="grid";
   renderGrid(); if(view.length) select(view[0].key);

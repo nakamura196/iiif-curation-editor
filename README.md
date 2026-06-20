@@ -1,4 +1,4 @@
-# IIIF Curation Editor ／ IIIF キュレーション・エディタ
+# AnnoVerdict ／ AnnoVerdict
 
 > Browser-only editor to review & curate **IIIF region annotations** (Keep / Drop) and export a clean
 > ground truth as a **IIIF Curation**. Deep-zoom with OpenSeadragon. Works for **any region** — faces,
@@ -9,7 +9,7 @@
 > **独立した汎用ツール**。**顔に限らず**物体・文字・図像など任意の領域に使える。OpenSeadragon で
 > 原寸ディープズーム。**画像も判定もブラウザ内で完結**し、第三者サーバに送信しない。
 
-**Live / 公開サイト:** https://nakamura196.github.io/iiif-curation-editor/
+**Live / 公開サイト:** https://nakamura196.github.io/anno-verdict/
 
 ---
 
@@ -42,14 +42,14 @@ The “Sample / URL” buttons use `fetch`, which is blocked on `file://` — us
 
 **B. Local server / ローカルサーバ**
 ```
-cd iiif-curation-editor
+cd anno-verdict
 python3 -m http.server 8000
 # http://localhost:8000/                      landing / ランディング
 # http://localhost:8000/editor.html?sample=1  auto-load sample / サンプル自動ロード
 ```
 
 **C. Publish on GitHub Pages / GitHub Pages で公開**
-Already published from `main` / root → https://nakamura196.github.io/iiif-curation-editor/ .
+Already published from `main` / root → https://nakamura196.github.io/anno-verdict/ .
 It is a no-build static site, so any fork can be served as-is. ビルド不要の静的サイト。
 
 ---

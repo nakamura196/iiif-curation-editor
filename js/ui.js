@@ -5,8 +5,8 @@
 (function () {
   const T = {
     ja: {
-      app: "IIIF キュレーション・エディタ",
-      app_short: "キュレーション",
+      app: "AnnoVerdict",
+      app_short: "AnnoVerdict",
       tagline_h: "AIが付けたアノテーションを、人手で確定する。",
       tagline_p: "IIIF Curation List(CODH / 顔貌コレクション形式)を読み込み、各<b>領域アノテーション</b>を <b>○採用 / ×却下</b> で確認して、クリーンな ground-truth を IIIF Curation として書き出します。顔に限らず物体・文字・図像など任意の領域に使えます。OpenSeadragon で原寸ディープズーム確認。<b>画像も判定もブラウザ内</b>で完結し、サーバに送りません。",
       open_editor: "エディタを開く →", try_sample: "サンプルで試す",
@@ -26,8 +26,8 @@
       home_title: "トップページへ",
     },
     en: {
-      app: "IIIF Curation Editor",
-      app_short: "Curation",
+      app: "AnnoVerdict",
+      app_short: "AnnoVerdict",
       tagline_h: "Confirm AI annotations, by hand.",
       tagline_p: "Load a IIIF Curation List (CODH / KaoKore format), review each <b>region annotation</b> with <b>Keep / Drop</b>, and export a clean ground truth as a IIIF Curation. Works for any region — faces, objects, text, figures. Deep-zoom with OpenSeadragon. <b>Images and decisions stay in your browser</b>; nothing is sent to a server.",
       open_editor: "Open editor →", try_sample: "Try with sample",
