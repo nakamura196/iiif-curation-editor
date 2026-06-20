@@ -1,0 +1,41 @@
+/* 東京大学カラー(淡青)ベースの共通スタイル.
+   UTokyo Blue(濃) #004898 / 淡青(light blue) #8caed0 を基調にする。 */
+:root{
+  --ut-blue:#004898;        /* 東京大学ブルー */
+  --ut-blue-d:#00346e;      /* 濃 */
+  --ut-tansei:#8caed0;      /* 淡青 */
+  --ut-tansei-l:#e7eff7;    /* 淡青の薄 */
+  --ink:#1b2733;
+  --muted:#5a6b7b;
+  --line:#d8e1ea;
+  --bg:#f6f9fc;
+  --card:#ffffff;
+  --ok:#2ca02c; --ng:#e23b3b; --hold:#e6a700;
+  --radius:10px;
+  --thumb-bg:#eef3f8;
+  --font: "Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+}
+:root[data-theme="dark"]{
+  --ink:#e7eef5; --muted:#9fb2c2; --line:#27343f; --bg:#0d1620; --card:#152130;
+  --ut-tansei-l:#15273c; --thumb-bg:#0f1a25;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.6}
+a{color:var(--ut-blue)}
+.ut-header{background:linear-gradient(180deg,var(--ut-blue),var(--ut-blue-d));color:#fff;padding:14px 22px;display:flex;align-items:center;gap:14px}
+.ut-header .logo{width:30px;height:30px;border:2px solid #fff;border-radius:6px;display:grid;place-items:center;font-weight:700}
+.ut-header h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.02em}
+.ut-header .sp{flex:1}
+.ut-header a{color:#cfe0f2;text-decoration:none;font-size:14px}
+.btn{display:inline-block;background:var(--ut-blue);color:#fff;border:none;border-radius:var(--radius);
+  padding:11px 20px;font-size:15px;font-weight:600;cursor:pointer;text-decoration:none}
+.btn:hover{background:var(--ut-blue-d)}
+.btn.ghost{background:#fff;color:var(--ut-blue);border:1.5px solid var(--ut-blue)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 22px}
+.hero{background:var(--ut-tansei-l);border-bottom:1px solid var(--line);padding:46px 0}
+.hero h2{font-size:30px;margin:0 0 10px;color:var(--ut-blue-d)}
+.hero p{font-size:16px;color:var(--muted);max-width:680px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.chip{display:inline-block;background:var(--ut-tansei-l);color:var(--ut-blue-d);border-radius:999px;padding:2px 10px;font-size:12px;margin:2px}
+footer{color:var(--muted);font-size:13px;padding:30px 0;border-top:1px solid var(--line);margin-top:36px}

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IIIF キュレーション・エディタ｜AI検出した領域を人手で確定</title>
+<meta name="description" content="IIIF Curation List を読み込み、AIが検出した領域アノテーション(顔・物体・文字など)をブラウザ内でo/x確認し、クリーンなground-truth(IIIF Curation)を作る独立ツール。OpenSeadragonで拡大、画像はサーバに送らない。">
+<link rel="stylesheet" href="css/utokyo.css">
+<script src="js/ui.js"></script>
+</head>
+<body>
+<header class="ut-header">
+  <span class="logo">◧</span>
+  <h1 data-i18n="app">IIIF キュレーション・エディタ</h1>
+  <span class="sp"></span>
+  <button id="langBtn" class="btn ghost" style="padding:5px 10px">EN</button>
+  <button id="themeBtn" class="btn ghost" style="padding:5px 10px">🌙</button>
+  <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h2 data-i18n="tagline_h">AIが付けたアノテーションを、人手で確定する。</h2>
+    <p data-i18n-html="tagline_p"></p>
+    <p style="margin-top:18px">
+      <a class="btn" href="editor.html" data-i18n="open_editor">エディタを開く →</a>
+      <a class="btn ghost" href="editor.html?sample=1" data-i18n="try_sample">サンプルで試す</a>
+    </p>
+    <p><span class="chip">IIIF</span><span class="chip">OpenSeadragon</span><span class="chip">browser-only</span><span class="chip">o/x</span><span class="chip">CC / open</span></p>
+  </div>
+</section>
+
+<main class="wrap" style="padding-top:34px">
+  <h3 data-i18n="howto">使い方(動画)</h3>
+  <div class="card" id="howto">
+    <div id="video-slot" style="aspect-ratio:16/9;background:var(--ut-tansei-l);border-radius:8px;display:grid;place-items:center;color:var(--muted)">
+      使い方動画(準備中) — index.html の <code>VIDEO_ID</code> に YouTube ID を設定
+    </div>
+  </div>
+
+  <h3 style="margin-top:30px" data-i18n="steps">3ステップ</h3>
+  <div class="grid3">
+    <div class="card"><b data-i18n="s1t">① 読み込む</b><p data-i18n="s1b"></p></div>
+    <div class="card"><b data-i18n="s2t">② 確認する</b><p data-i18n="s2b"></p></div>
+    <div class="card"><b data-i18n="s3t">③ 書き出す</b><p data-i18n="s3b"></p></div>
+  </div>
+
+  <h3 style="margin-top:30px" data-i18n="features">特長</h3>
+  <div class="card">
+    <ul>
+      <li><b>IIIF standard</b> — input/output is a IIIF Curation List. Interoperable with KaoKore / Curation Viewer.</li>
+      <li><b>Privacy</b> — images load directly from IIIF servers; decisions stay in localStorage. Nothing sent to a third party.</li>
+      <li><b>Standalone</b> — a no-build static site; host it on GitHub Pages as-is. Works for any region type (faces, objects, text).</li>
+    </ul>
+  </div>
+</main>
+
+<footer><div class="wrap">The University of Tokyo — IIIF Curation editor (general-purpose region annotation review). For PD/CC materials.</div></footer>
+
+<script>
+  const VIDEO_ID = ""; // 例: "abcdEFGhijk"
+  if (VIDEO_ID) {
+    document.getElementById("video-slot").outerHTML =
+      `<a href="https://youtu.be/${VIDEO_ID}" target="_blank" rel="noopener" style="display:block;position:relative">
+         <img src="https://img.youtube.com/vi/${VIDEO_ID}/hqdefault.jpg" style="width:100%;border-radius:8px;display:block">
+         <span style="position:absolute;inset:0;display:grid;place-items:center;font-size:46px;color:#fff;text-shadow:0 2px 8px #000">▶</span>
+       </a>`;
+  }
+</script>
+</body>
+</html>

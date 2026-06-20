@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IIIF キュレーション・エディタ</title>
+<link rel="stylesheet" href="css/utokyo.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+<script src="js/ui.js"></script>
+<style>
+ html,body{height:100%}
+ #bar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--ut-blue),var(--ut-blue-d));color:#fff;
+   padding:8px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+ #bar b{font-size:15px} #bar .stat{font-size:12px;color:#d7e6f5}
+ #bar select,#bar button,#bar .file{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.35);
+   border-radius:7px;padding:5px 9px;font-size:13px;cursor:pointer}
+ #bar button.on{background:#fff;color:var(--ut-blue);border-color:#fff}
+ #bar .file input{display:none}
+ #wrap{display:flex;height:calc(100vh - 48px)}
+ #left{flex:1;overflow:auto;padding:10px;background:var(--bg)}
+ #right{width:44%;min-width:380px;overflow:auto;padding:12px;border-left:1px solid var(--line);background:var(--card)}
+ #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+ .card{border:4px solid #c3ced9;border-radius:8px;overflow:hidden;background:var(--card);position:relative}
+ .card img{width:100%;display:block;height:120px;object-fit:contain;cursor:pointer;background:var(--thumb-bg);padding:3px}
+ .card.keep{border-color:var(--ok)} .card.drop{border-color:var(--ng)} .card.undecided{border-color:var(--hold)}
+ .card.sel{outline:3px solid var(--ut-blue);outline-offset:1px}
+ .meta{font-size:10px;padding:2px 4px;color:var(--muted);white-space:nowrap;overflow:hidden}
+ .btns{display:flex} .btns button{flex:1;border:none;border-top:1px solid var(--line);padding:4px 0;font-size:13px;cursor:pointer;background:var(--card);color:var(--ink)}
+ .btns .k{color:var(--ok)} .btns .d{color:var(--ng)} .btns .u{color:var(--hold)}
+ .btns .k.act{background:#e6f4e6} .btns .d.act{background:#fbe7e7} .btns .u.act{background:#fcf3da}
+ .tag{position:absolute;top:2px;right:2px;font-size:13px;font-weight:bold;padding:0 6px;border-radius:4px;background:#000a;color:#fff}
+ #osd{width:100%;height:60vh;background:#0c1116;border:1px solid var(--line);border-radius:8px}
+ #right h3{margin:6px 0;color:var(--ut-blue-d)} #right table{font-size:13px;border-collapse:collapse;margin:6px 0}
+ #right td{padding:2px 8px 2px 0;color:#33424f;vertical-align:top} #right td.k{color:#90a0ae;white-space:nowrap}
+ .bx{position:absolute;border:2px solid #0cf;box-sizing:border-box;cursor:pointer}
+ .bx span{position:absolute;top:-15px;left:0;font-size:10px;background:#000a;color:#0cf;padding:0 3px}
+ .bx.hl{border:3px solid #ff0;box-shadow:0 0 0 2px #000,0 0 14px 4px #fd0;animation:pulse 1s infinite;z-index:2}
+ .bx.hl span{color:#ff0}
+ @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+ .sibs{display:flex;flex-wrap:wrap;gap:6px} .sib{width:84px;border:3px solid #c3ced9;border-radius:6px;overflow:hidden;cursor:pointer;position:relative;background:var(--thumb-bg)}
+ .sib img{width:100%;height:64px;object-fit:contain;display:block;background:var(--thumb-bg);padding:2px}
+ .sib.keep{border-color:var(--ok)}.sib.drop{border-color:var(--ng)}.sib.undecided{border-color:var(--hold)}.sib.cur{outline:2px solid var(--ut-blue)}
+ .sib .t{position:absolute;top:0;right:0;font-size:11px;background:#000a;color:#fff;padding:0 3px}
+ #drop{position:fixed;inset:0;background:#004898cc;color:#fff;display:none;place-items:center;font-size:22px;z-index:50}
+ #empty{display:grid;place-items:center;height:100%;text-align:center;color:var(--muted)}
+ #empty .box{max-width:520px} kbd{background:#345;border-radius:4px;padding:1px 5px;font-size:12px;color:#fff}
+</style>
+</head>
+<body>
+<div id="bar">
+ <a href="index.html" style="color:#fff;text-decoration:none;font-weight:700" data-i18n-title="home_title">🏠 <b data-i18n="app_short">顔キュレーション</b></a>
+ <label class="file">📂 <span data-i18n="load">読み込む</span><input type="file" id="file" accept=".json,application/json"></label>
+ <button id="loadurl" data-i18n="url">URL</button>
+ <button id="sample" data-i18n="sample">サンプル</button>
+ <span class="stat" id="src"></span>
+ <span style="width:1px;height:20px;background:#ffffff55"></span>
+ <span class="stat" data-i18n="show">表示:</span>
+ <button data-f="all" class="on" data-i18n="all">全部</button>
+ <button data-f="undecided" data-i18n="undecided">未定</button>
+ <button data-f="drop" data-i18n="drop">却下</button>
+ <button data-f="keep" data-i18n="keep">採用</button>
+ <select id="sort"><option value="fig" data-i18n="sort_fig">図版順</option><option value="confA" data-i18n="sort_cA">確信度 低→高</option><option value="confD" data-i18n="sort_cD">確信度 高→低</option><option value="undef" data-i18n="sort_u">未定優先</option></select>
+ <span class="sp" style="flex:1"></span>
+ <span class="stat" id="stat"></span>
+ <button id="reload" data-i18n="reload">壊れ再読込</button>
+ <button id="expd" data-i18n="exp_d">decisions.json</button>
+ <button id="expc" data-i18n="exp_c">Curation書出</button>
+ <button id="langBtn" title="EN/日本語">EN</button>
+ <button id="themeBtn" title="dark/light">🌙</button>
+</div>
+<div id="wrap">
+ <div id="left"><div id="empty"><div class="box">
+   <h2 style="color:var(--ut-blue-d)" data-i18n="empty_h">IIIF Curation を読み込んでください</h2>
+   <p data-i18n-html="empty_p">ここに <b>.json をドラッグ&ドロップ</b>、または上の「📂 読み込む / URL / サンプル」。</p>
+   <p><button class="btn" id="sample2" data-i18n="try_sample">サンプルで試す</button></p>
+ </div></div><div id="grid" style="display:none"></div></div>
+ <div id="right"><p class="meta" data-i18n="right_hint">カードを選ぶと、ここに OpenSeadragon で原寸表示＋全矩形＋選択ハイライトが出ます。</p></div>
+</div>
+<div id="drop">ここにドロップして読み込み</div>
+<script>
+const THUMB=240, LS="iiif_face_curation_decisions";
+let SRC=null, ITEMS=[], byFig={}, dec={}, filter="all", sortKey="fig", view=[], sel=null, viewer=null;
+const DCOL={keep:"var(--ok)",drop:"var(--ng)",undecided:"var(--hold)"};
+const $=id=>document.getElementById(id);
+const save=()=>{try{localStorage.setItem(LS,JSON.stringify(dec))}catch(e){}};
+
+function parseCuration(c){
+  const items=[];
+  (c.selections||c.members? (c.selections||[{members:c.members,within:c.within}]) : []).forEach(sel=>{
+    const within=sel.within&&(sel.within["@id"]||sel.within);
+    (sel.members||[]).forEach(m=>{
+      const mid=m["@id"]||""; const hi=mid.indexOf("#xywh=");
+      if(hi<0) return;
+      const canvas=mid.slice(0,hi);
+      const v=mid.slice(hi+6).replace("pct:","").split(",").map(Number);
+      if(v.length<4||v.some(isNaN)) return;
+      const [x,y,w,h]=v, md={};
+      (m.metadata||[]).forEach(e=>{if(e.label)md[(e.label+"").toLowerCase()]=e.value;});
+      items.push({key:mid, fig:canvas, canvas, manifest:within, bbox:[x,y,x+w,y+h],
+        crop:`${canvas}/${x},${y},${w},${h}/${THUMB},/0/default.jpg`,
+        tile:canvas+"/info.json", title:md.title||"", source:md.source||"iiif",
+        conf:(md.confidence||md.conf||""), sex:md.sex||"", label:m.label||""});
+    });
+  });
+  return items;
+}
+function load(c, name){
+  SRC=c; ITEMS=parseCuration(c);
+  if(!ITEMS.length){ alert("領域(canvas#xywh)が見つかりませんでした。IIIF Curation List か確認してください。"); return; }
+  byFig={}; ITEMS.forEach(it=>{(byFig[it.fig]=byFig[it.fig]||[]).push(it);});
+  ITEMS.forEach((it,i)=>it.i=byFig[it.fig].indexOf(it));
+  try{dec=JSON.parse(localStorage.getItem(LS)||"{}")}catch(e){dec={}}
+  ITEMS.forEach(it=>{if(!(it.key in dec))dec[it.key]="keep";});
+  $("src").textContent=`${name||"読込"}: 顔${ITEMS.length} / canvas${Object.keys(byFig).length}`;
+  $("empty").style.display="none"; $("grid").style.display="grid";
+  renderGrid(); if(view.length) select(view[0].key);
+}
+function pass(it){const s=dec[it.key]; return filter==="all"?true:s===filter;}
+function cnum(it){const n=parseFloat(it.conf); return isNaN(n)?9:n;}
+function sortView(a,b){
+  if(sortKey==="confA")return cnum(a)-cnum(b);
+  if(sortKey==="confD")return cnum(b)-cnum(a);
+  if(sortKey==="undef"){const o={undecided:0,drop:1,keep:2};return o[dec[a.key]]-o[dec[b.key]]||cnum(a)-cnum(b);}
+  return (a.fig+("000"+a.i).slice(-4)).localeCompare(b.fig+("000"+b.i).slice(-4));
+}
+function tag(s){return s==="keep"?"○":(s==="drop"?"×":"?");}
+function renderGrid(){
+  view=ITEMS.filter(pass).sort(sortView); const g=$("grid"); g.innerHTML="";
+  view.forEach(it=>{const s=dec[it.key]; const el=document.createElement("div"); el.dataset.key=it.key;
+    el.className="card "+s+(it.key===sel?" sel":"");
+    el.innerHTML=`<div class="tag" style="color:#fff">${tag(s)}</div>`+
+      `<img loading="lazy" src="${it.crop}">`+
+      `<div class="meta">#${it.i} ${it.source} ${it.conf}</div>`+
+      `<div class="btns"><button class="k" data-s="keep">○</button><button class="d" data-s="drop">×</button><button class="u" data-s="undecided">?</button></div>`;
+    el.querySelector("img").onclick=()=>select(it.key);
+    el.querySelectorAll(".btns button").forEach(b=>{b.classList.toggle("act",b.dataset.s===s);
+      b.onclick=e=>{e.stopPropagation();setDec(it.key,b.dataset.s);};});
+    el.querySelector("img").onerror=retryImg; g.appendChild(el);});
+  updateStat();
+}
+function retryImg(){const n=(+this.dataset.r||0)+1;if(n<=3){this.dataset.r=n;const s=this.getAttribute("src");this.removeAttribute("src");setTimeout(()=>this.setAttribute("src",s),250*n);}}
+function updateStat(){const a=ITEMS.length,k=Object.values(dec).filter(x=>x==="keep").length,
+  d=Object.values(dec).filter(x=>x==="drop").length,u=Object.values(dec).filter(x=>x==="undecided").length;
+  $("stat").textContent=t("stat",view.length,a,k,d,u);}
+window.onLangApplied=function(){ if(ITEMS.length){renderGrid(); if(sel)renderRight(sel);} };
+function setDec(key,v){dec[key]=v;save();const el=$("grid").querySelector(`[data-key="${CSS.escape(key)}"]`);
+  if(el){const s=v;el.className="card "+s+(key===sel?" sel":"");el.querySelector(".tag").textContent=tag(s);
+    el.querySelectorAll(".btns button").forEach(b=>b.classList.toggle("act",b.dataset.s===s));}
+  if(sel&&ITEMS.find(x=>x.key===sel)?.fig===ITEMS.find(x=>x.key===key)?.fig)renderRight(sel);
+  updateStat();}
+function select(key){sel=key;document.querySelectorAll(".card").forEach(c=>c.classList.toggle("sel",c.dataset.key===key));renderRight(key);}
+function renderRight(key){const it=ITEMS.find(x=>x.key===key);if(!it)return;const sibs=byFig[it.fig]||[];
+  $("right").innerHTML=`<h3>${it.title||it.label||"region"} #${it.i}</h3><div id="osd"></div>`+
+    `<table><tr><td class="k">canvas</td><td style="word-break:break-all">${it.canvas}</td></tr>`+
+    `<tr><td class="k">${t("f_detector")}</td><td>${it.source} (conf ${it.conf||"-"})</td></tr>`+
+    (it.sex?`<tr><td class="k">sex</td><td>${it.sex}</td></tr>`:``)+
+    `<tr><td class="k">${t("f_decision")}</td><td><b>${tag(dec[it.key])} ${dec[it.key]}</b></td></tr></table>`+
+    `<div class="meta">${t("sibs")} (${sibs.length}):</div>`+
+    `<div class="sibs">`+sibs.map(s=>`<div class="sib ${dec[s.key]}${s.key===key?" cur":""}" data-k="${s.key}"><div class="t">#${s.i} ${tag(dec[s.key])}</div><img loading="lazy" src="${s.crop}"></div>`).join("")+`</div>`;
+  $("right").querySelectorAll(".sib").forEach(e=>e.onclick=()=>select(e.dataset.k));
+  if(viewer){try{viewer.destroy()}catch(e){}viewer=null;}
+  if(typeof OpenSeadragon==="undefined")return;
+  viewer=OpenSeadragon({id:"osd",tileSources:it.tile,prefixUrl:"https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
+    showNavigator:true,gestureSettingsMouse:{clickToZoom:false}});
+  viewer.addHandler("open",()=>{
+    sibs.forEach(s=>{const el=document.createElement("div");el.className="bx "+(s.key===key?"hl":"");
+      el.style.borderColor=DCOL[dec[s.key]];el.innerHTML=`<span>#${s.i}</span>`;el.onclick=()=>select(s.key);
+      const b=s.bbox;viewer.addOverlay({element:el,location:viewer.viewport.imageToViewportRectangle(b[0],b[1],b[2]-b[0],b[3]-b[1])});});
+    const b=it.bbox,w=b[2]-b[0],h=b[3]-b[1];
+    viewer.viewport.fitBounds(viewer.viewport.imageToViewportRectangle(b[0]-w,b[1]-h,w*3,h*3),true);
+  });
+}
+function dl(obj,name){const b=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;a.click();}
+// --- UI 配線 ---
+document.querySelectorAll('#bar button[data-f]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#bar button[data-f]').forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");filter=b.dataset.f;renderGrid();});
+$("sort").onchange=e=>{sortKey=e.target.value;renderGrid();};
+$("file").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{load(JSON.parse(r.result),f.name)}catch(err){alert("JSON解析失敗: "+err.message)}};r.readAsText(f);};
+$("loadurl").onclick=async()=>{const u=prompt("IIIF Curation の URL:");if(!u)return;
+  try{const r=await fetch(u);load(await r.json(),u.split("/").pop())}catch(e){alert("取得失敗: "+e.message)}};
+const loadSample=async()=>{try{const r=await fetch("sample/face_gt_curation.sample.json");load(await r.json(),"sample")}catch(e){alert("サンプル取得失敗: "+e.message)}};
+$("sample").onclick=loadSample; $("sample2").onclick=loadSample;
+$("reload").onclick=()=>{let k=0;$("grid").querySelectorAll("img").forEach(im=>{if(im.complete&&im.naturalWidth===0){k++;const s=im.getAttribute("src");im.removeAttribute("src");setTimeout(()=>im.setAttribute("src",s),40);}});};
+$("expd").onclick=()=>dl(dec,"decisions.json");
+$("expc").onclick=()=>{if(!SRC)return;const c=JSON.parse(JSON.stringify(SRC));
+  c.label=(c.label||"curation")+" (confirmed)";
+  c.selections=(c.selections||[]).map(s=>({...s,members:(s.members||[]).filter(m=>dec[m["@id"]]==="keep")})).filter(s=>(s.members||[]).length);
+  dl(c,"curation_confirmed.json");};
+document.onkeydown=e=>{if(!view.length)return;let i=view.findIndex(x=>x.key===sel);if(i<0)i=0;
+  if(e.key==="ArrowRight"||e.key==="ArrowDown"){i=Math.min(i+1,view.length-1);select(view[i].key);}
+  else if(e.key==="ArrowLeft"||e.key==="ArrowUp"){i=Math.max(i-1,0);select(view[i].key);}
+  else if(e.key==="k"||e.key==="o"){if(sel)setDec(sel,"keep");}
+  else if(e.key==="d"||e.key==="x"){if(sel)setDec(sel,"drop");}
+  else if(e.key==="u"){if(sel)setDec(sel,"undecided");} else return;
+  e.preventDefault();const el=$("grid").querySelector(`[data-key="${CSS.escape(sel)}"]`);if(el)el.scrollIntoView({block:"nearest"});};
+// ドラッグ&ドロップ
+const dz=$("drop");
+window.addEventListener("dragover",e=>{e.preventDefault();dz.style.display="grid";});
+dz.addEventListener("dragleave",()=>dz.style.display="none");
+window.addEventListener("drop",e=>{e.preventDefault();dz.style.display="none";const f=e.dataTransfer.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{try{load(JSON.parse(r.result),f.name)}catch(err){alert("JSON解析失敗")}};r.readAsText(f);});
+// ?sample=1 で自動ロード
+if(new URLSearchParams(location.search).get("sample"))loadSample();
+</script>
+</body>
+</html>
