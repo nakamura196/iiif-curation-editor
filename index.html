@@ -89,13 +89,13 @@
 <footer><div class="wrap">The University of Tokyo — IIIF Curation editor (general-purpose region annotation review). For PD/CC materials.</div></footer>
 
 <script>
-  const VIDEO_ID = ""; // 例: "abcdEFGhijk"
+  const VIDEO_ID = "WCOrCRnI8Js"; // YouTube 動画ID
   if (VIDEO_ID) {
     document.getElementById("video-slot").outerHTML =
-      `<a href="https://youtu.be/${VIDEO_ID}" target="_blank" rel="noopener" style="display:block;position:relative">
-         <img src="https://img.youtube.com/vi/${VIDEO_ID}/hqdefault.jpg" style="width:100%;border-radius:8px;display:block">
-         <span style="position:absolute;inset:0;display:grid;place-items:center;font-size:46px;color:#fff;text-shadow:0 2px 8px #000">▶</span>
-       </a>`;
+      `<iframe style="width:100%;aspect-ratio:16/9;border:0;border-radius:8px" loading="lazy"
+         src="https://www.youtube-nocookie.com/embed/${VIDEO_ID}"
+         title="AnnoVerdict tutorial" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+         allowfullscreen></iframe>`;
   }
 </script>
 </body>
